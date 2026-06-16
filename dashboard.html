@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MedRural Colombia - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#b8dbff",
+                        "inverse-surface": "#2d3133",
+                        "inverse-primary": "#89ceff",
+                        "triage-urgent": "#C0392B",
+                        "secondary-fixed": "#cee5ff",
+                        "tertiary-fixed-dim": "#ffb4a4",
+                        "on-secondary-container": "#3e6080",
+                        "surface-container": "#ebeef0",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004c6e",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e5e9eb",
+                        "surface": "#f7fafc",
+                        "surface-container-low": "#f1f4f6",
+                        "price-accent": "#D4AC0D",
+                        "status-success": "#27AE60",
+                        "primary-fixed-dim": "#89ceff",
+                        "on-primary-fixed": "#001e2f",
+                        "primary": "#00628d",
+                        "secondary": "#3f6181",
+                        "outline-variant": "#bec8d1",
+                        "on-surface-variant": "#3e4850",
+                        "tertiary-container": "#d73b19",
+                        "on-secondary-fixed-variant": "#264a68",
+                        "status-warning": "#F2994A",
+                        "outline": "#6f7881",
+                        "status-error": "#EB5757",
+                        "clinical-purple": "#8E44AD",
+                        "surface-bright": "#f7fafc",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e0e3e5",
+                        "on-secondary-fixed": "#001d33",
+                        "primary-container": "#007cb1",
+                        "on-surface": "#181c1e",
+                        "tertiary": "#b22200",
+                        "secondary-fixed-dim": "#a7caee",
+                        "surface-dim": "#d7dadc",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#eef1f3",
+                        "surface-tint": "#006591",
+                        "on-primary-container": "#fcfcff",
+                        "on-tertiary-fixed-variant": "#8c1800",
+                        "background": "#f7fafc",
+                        "on-tertiary-container": "#fffbff",
+                        "on-background": "#181c1e",
+                        "on-tertiary-fixed": "#3d0600",
+                        "primary-fixed": "#c9e6ff",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed": "#ffdad3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "1rem",
+                        "section-gap": "4rem",
+                        "gutter-grid": "1rem",
+                        "stack-sm": "0.5rem",
+                        "stack-lg": "2rem",
+                        "margin-edge": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "metadata": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-bold": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "26px", "fontWeight": "600" }],
+                        "metadata": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "30px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f7fafc; /* background */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background pb-24 md:pb-0 md:pl-80">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-40 bg-surface dark:bg-on-background shadow-sm transition-all duration-200 active:scale-95 flex justify-between items-center px-margin-edge py-stack-md"><div class="flex items-center gap-4"><button class="p-2 hover:bg-surface-container-high rounded-full transition-colors"><span class="material-symbols-outlined text-primary">menu</span></button><h1 class="font-headline-md text-headline-md font-bold text-primary">MedRural Colombia</h1></div><div class="flex items-center gap-4 text-primary"><span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-high rounded-full p-2 transition-colors">notifications</span><div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden border-2 border-primary cursor-pointer hover:bg-surface-container-high transition-colors"><img alt="Doctor Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGiVze3ZBZMQqhiKVtpp96N11u59pCSZO22kXD5AUkq4u4YuJmhAslOM3vtd1lj3tKDf3CBl_ctqZgesW6VvSg2IDccKXQKucHCwZNUnQsoJeJO6CGgT9gzqFXCr1faDMQBLpyxwi6rQ3yAN7O_cPyn2NIwcmua7GqIvkd4JZ8195xkZPnS8d5lZBhg3ZISbUbusZpntfybWIJDxM2BmadkTKSrzwbe3uIVc7HQHd-2NKOEEZoT51TVCMumYWlhxOXVhGAgYfzEME"/></div></div></header>
+<!-- NavigationDrawer (Desktop) -->
+<aside class="hidden md:flex flex-col h-full py-stack-lg w-80 fixed left-0 top-0 z-50 bg-surface border-r border-outline-variant shadow-xl ease-in-out duration-300"><div class="px-margin-edge mb-8"><div class="flex items-center gap-4 mb-4"><div class="w-16 h-16 rounded-full bg-primary-container overflow-hidden border-2 border-primary"><img alt="Dr. Silva" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGNCHiO7NO6DvPQ5i_WGQstyeqVUgT2YFWaTcqo6J_ZoasL0q9SC4ECGoifKyOh6-nfXqcZ48aPhaL-rYqLipGOy_2ONgT2Zr9WVlMo5WLRH3-4lJBxR5wBsH4pW8-fW4iSRCNETc-XFhlBudSt3wisHtxL7hmbYFx7tnAj6M9AfWRyDPuHHRZ2uZDlKVGcMIVfsyuYxgZxOPBBSYczvIHYdjNDKMAX6GYrU3Gsory-3-eeK3jAyPnRQPVwO-DFUPdAoC6jK00OBA"/></div><div><h2 class="font-headline-sm text-headline-sm text-primary">Dr. Mateo Silva</h2><p class="font-body-sm text-body-sm text-on-surface-variant">Hospital Rural Nivel 1</p></div></div><div class="grid grid-cols-3 gap-2 mt-4 border-t border-outline-variant pt-4"><div class="text-center"><span class="material-symbols-outlined text-primary text-sm">schedule</span><p class="text-[10px] font-label-bold text-on-surface-variant">Horarios</p></div><div class="text-center"><span class="material-symbols-outlined text-primary text-sm">more_time</span><p class="text-[10px] font-label-bold text-on-surface-variant">Extras</p></div><div class="text-center"><span class="material-symbols-outlined text-primary text-sm">payments</span><p class="text-[10px] font-label-bold text-on-surface-variant">Salarios</p></div></div></div><nav class="flex-1 overflow-y-auto px-4"><ul class="space-y-2"><li class=""><a class="flex items-center gap-4 px-4 py-3 bg-secondary-fixed text-on-secondary-fixed font-bold rounded-r-full" href="#"><span class="material-symbols-outlined">school</span><span class="font-body-md">Simulador CACES</span></a></li><li class=""><a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-r-full" href="#"><span class="material-symbols-outlined">calculate</span><span class="font-body-md">Herramientas</span></a></li><li class="flex flex-col"><div class="flex items-center justify-between px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-r-full cursor-pointer"><div class="flex items-center gap-4"><span class="material-symbols-outlined">location_on</span><span class="font-body-md">Rural</span></div><span class="material-symbols-outlined text-sm">expand_more</span></div><ul class="pl-12 pr-4 py-1 space-y-1"><li><a class="flex items-center gap-3 py-2 text-sm text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">clinical_notes</span>Historias Clínicas</a></li><li><a class="flex items-center gap-3 py-2 text-sm text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">group</span>Pacientes</a></li><li><a class="flex items-center gap-3 py-2 text-sm text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">event</span>Turnos</a></li></ul></li><li class="flex flex-col"><div class="flex items-center justify-between px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-r-full cursor-pointer"><div class="flex items-center gap-4"><span class="material-symbols-outlined">domain</span><span class="font-body-md">Internado</span></div><span class="material-symbols-outlined text-sm">expand_more</span></div><ul class="pl-12 pr-4 py-1 space-y-1"><li><a class="flex items-center gap-3 py-2 text-sm text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">clinical_notes</span>Historias Clínicas</a></li><li><a class="flex items-center gap-3 py-2 text-sm text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">group</span>Pacientes</a></li><li><a class="flex items-center gap-3 py-2 text-sm text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">event</span>Turnos</a></li></ul></li><li class=""><a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-r-full" href="#"><span class="material-symbols-outlined">menu_book</span><span class="font-body-md">Biblioteca</span></a></li><li class=""><a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-r-full" href="#"><span class="material-symbols-outlined">checklist</span><span class="font-body-md">Guías paso a paso</span></a></li><li class=""><a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-r-full" href="#"><span class="material-symbols-outlined">lightbulb</span><span class="font-body-md">ABP</span></a></li><li class=""><a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-r-full" href="#"><span class="material-symbols-outlined">person</span><span class="font-body-md">Perfil</span></a></li></ul></nav><div class="px-4 mt-auto pt-4 border-t border-outline-variant"><a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-r-full" href="#"><span class="material-symbols-outlined">settings</span><span class="font-body-md">Configuraciones</span></a></div></aside>
+<!-- Main Content Canvas -->
+<main class="max-w-7xl mx-auto px-margin-edge py-stack-lg">
+<section>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Módulos Principales</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter-grid">
+<!-- Simulador CACES -->
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-2xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer flex flex-col group relative">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined">school</span>
+</div>
+<span class="bg-primary text-on-primary font-label-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">Estás Aquí</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright mb-2 flex items-center gap-1 group-hover:text-primary transition-colors">
+                    Simulador CACES
+                    <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant mt-auto">Banco de preguntas + simuladores configurables para Medicina, Enfermería y Odontología.</p>
+</div>
+<!-- Herramientas -->
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-2xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer flex flex-col group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-clinical-purple/10 text-clinical-purple flex items-center justify-center">
+<span class="material-symbols-outlined">calculate</span>
+</div>
+<span class="bg-status-success/20 text-status-success font-label-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">Disponible</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright mb-2 flex items-center gap-1 group-hover:text-clinical-purple transition-colors">
+                    Herramientas
+                    <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant mt-auto">26 calculadoras y plantillas para la práctica clínica.</p>
+</div>
+<!-- Módulo Rural -->
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-2xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer flex flex-col group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<span class="bg-status-success/20 text-status-success font-label-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">Disponible</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright mb-2 flex items-center gap-1 group-hover:text-status-success transition-colors">
+                    Módulo Rural
+                    <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant mt-auto">Guías y protocolos para tu año de medicina rural.</p>
+</div>
+<!-- Internado -->
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-2xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer flex flex-col group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-status-warning/10 text-status-warning flex items-center justify-center">
+<span class="material-symbols-outlined">domain</span>
+</div>
+<span class="bg-status-success/20 text-status-success font-label-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">Disponible</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright mb-2 flex items-center gap-1 group-hover:text-status-warning transition-colors">
+                    Internado
+                    <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant mt-auto">Material de apoyo para el internado rotativo.</p>
+</div>
+<!-- Biblioteca médica -->
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-2xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer flex flex-col group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<span class="bg-status-success/20 text-status-success font-label-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">Disponible</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright mb-2 flex items-center gap-1 group-hover:text-secondary transition-colors">
+                    Biblioteca médica
+                    <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant mt-auto">Compendio de referencias, libros y artículos clave.</p>
+</div>
+<!-- Guías paso a paso -->
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-2xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer flex flex-col group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-surface-tint/10 text-surface-tint flex items-center justify-center">
+<span class="material-symbols-outlined">checklist</span>
+</div>
+<span class="bg-status-success/20 text-status-success font-label-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">Disponible</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright mb-2 flex items-center gap-1 group-hover:text-surface-tint transition-colors">
+                    Guías paso a paso
+                    <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant mt-auto">Procedimientos y protocolos clínicos detallados.</p>
+</div>
+<!-- ABP -->
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-2xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer flex flex-col group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-price-accent/10 text-price-accent flex items-center justify-center">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<span class="bg-status-success/20 text-status-success font-label-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">Disponible</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright mb-2 flex items-center gap-1 group-hover:text-price-accent transition-colors">
+                    ABP
+                    <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant mt-auto">Aprendizaje basado en problemas clínicos reales.</p>
+</div>
+<!-- Examen complexivo PUCE -->
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-2xl p-6 shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer flex flex-col group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-error-container text-on-error-container flex items-center justify-center">
+<span class="material-symbols-outlined">history_edu</span>
+</div>
+<span class="bg-status-success/20 text-status-success font-label-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">Disponible</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright mb-2 flex items-center gap-1 group-hover:text-error transition-colors">
+                    Examen complexivo PUCE
+                    <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant mt-auto">Preparación específica para el examen de la PUCE.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-2 pb-safe bg-surface-container dark:bg-inverse-surface shadow-[0_-4px_12px_rgba(0,45,74,0.08)] rounded-t-xl transition-transform active:scale-90 font-label-bold text-label-bold text-primary dark:text-primary-fixed-dim"><a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1" href="#"><span class="material-symbols-outlined fill">school</span><span class="text-[10px] mt-1">Simulador</span></a><a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary" href="#"><span class="material-symbols-outlined">lightbulb</span><span class="text-[10px] mt-1">ABP</span></a><a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary" href="#"><span class="material-symbols-outlined">location_on</span><span class="text-[10px] mt-1">Rural</span></a><a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary" href="#"><span class="material-symbols-outlined">domain</span><span class="text-[10px] mt-1">Internado</span></a><a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary" href="#"><span class="material-symbols-outlined">person</span><span class="text-[10px] mt-1">Perfil</span></a></nav>
+</body></html>
