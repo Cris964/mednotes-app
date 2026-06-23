@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Calculator, Activity, Brain, Baby, Droplets, ChevronRight, Syringe, AlertTriangle } from 'lucide-react';
+import { Calculator, Activity, Brain, Baby, Droplets, ChevronRight, Syringe, AlertTriangle, Search, ArrowLeft } from 'lucide-react';
 
 export default function Herramientas() {
   const [activeTab, setActiveTab] = useState('calculadoras');
 
-  // Herramienta 3: SIR (Secuencia Intubación Rápida)
+  // Buscador y Detalle de Medicamentos
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMed, setSelectedMed] = useState(null);
   const [pesoSir, setPesoSir] = useState('');
   
   const medsSir = [
@@ -15,21 +17,18 @@ export default function Herramientas() {
     { id: 'rocuronio', nombre: 'Rocuronio', tipo: 'Paralizante', dosisEstandar: '1 mg/kg', dosisUnidad: 'mg', valorDosis: 1, presentacion: '50 mg / 5 ml', mgTotal: 50, mlTotal: 5, uso: 'Alternativa segura si hay contraindicación para Succinilcolina.' },
   ];
 
-  const calcularSIR = () => {
-    if (!pesoSir) return null;
-    return medsSir.map(med => {
-      let dosisMg = med.dosisUnidad === 'mcg' ? (pesoSir * med.valorDosis) / 1000 : pesoSir * med.valorDosis;
-      let concentracion = med.mgTotal / med.mlTotal;
-      let volumenMl = dosisMg / concentracion;
-      return {
-        ...med,
-        dosisTotalMg: dosisMg.toFixed(2),
-        volumenTotalMl: volumenMl.toFixed(1)
-      };
-    });
-  };
+  const filteredMeds = medsSir.filter(med => med.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const resultadosSIR = calcularSIR();
+  let medCalculated = null;
+  if (selectedMed && pesoSir) {
+    let dosisMg = selectedMed.dosisUnidad === 'mcg' ? (pesoSir * selectedMed.valorDosis) / 1000 : pesoSir * selectedMed.valorDosis;
+    let concentracion = selectedMed.mgTotal / selectedMed.mlTotal;
+    let volumenMl = dosisMg / concentracion;
+    medCalculated = {
+      dosisTotalMg: dosisMg.toFixed(2),
+      volumenTotalMl: volumenMl.toFixed(1)
+    };
+  }
 
   return (
     <div className="animate-fade-in pb-20 md:pb-0">
@@ -54,63 +53,136 @@ export default function Herramientas() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Calculadora SIR */}
-          <div className="bg-surface/80 backdrop-blur-xl rounded-3xl p-6 border border-outline/10 shadow-sm lg:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-error/10 text-error flex items-center justify-center">
-                <Syringe className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-on-surface">Calculadora de Dosis de Medicamentos</h3>
-                <p className="text-sm text-on-surface-variant">Cálculo exacto en mililitros (cc) según presentación</p>
-              </div>
-            </div>
-            
-            <div className="bg-surface-container-low border border-outline/20 rounded-2xl p-4 mb-6 flex flex-col md:flex-row items-center gap-4">
-              <label className="text-lg font-bold text-on-surface-variant whitespace-nowrap">Peso del Paciente:</label>
-              <div className="relative w-full md:w-64">
-                <input type="number" placeholder="Ej: 70" value={pesoSir} onChange={e => setPesoSir(e.target.value)} className="w-full bg-surface border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-error text-xl font-bold" />
-                <span className="absolute right-4 top-3 text-on-surface-variant font-bold">kg</span>
-              </div>
-            </div>
-            
-            {!resultadosSIR ? (
-              <div className="bg-surface-container p-8 rounded-2xl border border-transparent text-center opacity-50">
-                <p className="text-lg font-bold">Ingresa el peso del paciente para ver las dosis en cc</p>
-              </div>
+          <div className="bg-surface/80 backdrop-blur-xl rounded-3xl p-6 border border-outline/10 shadow-sm lg:col-span-2 min-h-[400px]">
+            {!selectedMed ? (
+              // Vista de Buscador
+              <>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-error/10 text-error flex items-center justify-center">
+                    <Syringe className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-on-surface">Calculadora de Dosis de Medicamentos</h3>
+                    <p className="text-sm text-on-surface-variant">Vademécum y cálculo exacto en cc según presentación</p>
+                  </div>
+                </div>
+                
+                <div className="relative mb-6">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-on-surface-variant" />
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Buscar medicamento (ej: Fentanilo)..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-surface-container-low border border-outline/20 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:border-primary text-on-surface"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {filteredMeds.map(med => (
+                    <button 
+                      key={med.id}
+                      onClick={() => { setSelectedMed(med); setPesoSir(''); }}
+                      className="text-left bg-surface border border-outline/10 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-primary/30 transition-all group relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 right-0 w-1.5 h-full bg-error/50 group-hover:bg-error transition-colors"></div>
+                      <h4 className="font-bold text-lg text-on-surface group-hover:text-primary transition-colors">{med.nombre}</h4>
+                      <p className="text-sm text-on-surface-variant mb-2">{med.tipo}</p>
+                      <p className="text-xs text-outline">{med.dosisEstandar}</p>
+                    </button>
+                  ))}
+                  {filteredMeds.length === 0 && (
+                    <div className="col-span-full text-center py-8 text-on-surface-variant">
+                      No se encontraron medicamentos con ese nombre.
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {resultadosSIR.map((med) => (
-                  <div key={med.id} className="bg-surface border border-outline/10 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col">
-                    <div className="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-error to-error/50"></div>
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-bold text-lg text-on-surface">{med.nombre}</h4>
-                      <span className="text-xs font-bold bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-md">{med.tipo}</span>
+              // Vista de Detalle de Medicamento
+              <div className="animate-fade-in flex flex-col h-full">
+                <button 
+                  onClick={() => setSelectedMed(null)}
+                  className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-bold mb-6 w-fit"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  Volver al buscador
+                </button>
+                
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Detalles Clinicos */}
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start mb-4">
+                      <h2 className="text-3xl font-extrabold text-on-surface">{selectedMed.nombre}</h2>
+                      <span className="text-xs font-bold bg-surface-container-high text-on-surface-variant px-3 py-1.5 rounded-lg uppercase tracking-wider">{selectedMed.tipo}</span>
                     </div>
                     
-                    <div className="flex flex-col gap-1 mb-4 flex-1">
-                      <p className="text-sm text-on-surface-variant"><span className="font-semibold">Dosis:</span> {med.dosisEstandar}</p>
-                      <p className="text-sm text-on-surface-variant"><span className="font-semibold">Presentación:</span> {med.presentacion}</p>
-                      <p className="text-sm text-on-surface-variant mt-1">{med.uso}</p>
-                      {med.alerta && (
-                        <div className="flex items-start gap-1 mt-2 text-status-warning bg-status-warning/10 p-2 rounded-lg text-xs font-semibold">
-                          <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                          <p>{med.alerta}</p>
+                    <div className="space-y-4">
+                      <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline/10">
+                        <p className="text-sm text-on-surface-variant mb-1">Dosis Recomendada</p>
+                        <p className="text-lg font-bold text-on-surface">{selectedMed.dosisEstandar}</p>
+                      </div>
+                      
+                      <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline/10">
+                        <p className="text-sm text-on-surface-variant mb-1">Presentación Comercial (Colombia)</p>
+                        <p className="text-lg font-bold text-on-surface">{selectedMed.presentacion}</p>
+                      </div>
+                      
+                      <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline/10">
+                        <p className="text-sm text-on-surface-variant mb-1">Indicación / Uso</p>
+                        <p className="text-base text-on-surface">{selectedMed.uso}</p>
+                      </div>
+                      
+                      {selectedMed.alerta && (
+                        <div className="flex items-start gap-2 bg-status-warning/10 border border-status-warning/20 p-4 rounded-2xl text-status-warning">
+                          <AlertTriangle className="w-6 h-6 flex-shrink-0" />
+                          <p className="font-semibold text-sm">{selectedMed.alerta}</p>
                         </div>
                       )}
                     </div>
+                  </div>
+                  
+                  {/* Calculadora */}
+                  <div className="w-full md:w-80 bg-surface-container-low rounded-3xl p-6 border border-outline/20 flex flex-col">
+                    <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
+                      <Calculator className="w-5 h-5 text-primary" />
+                      Calcular Dosis
+                    </h3>
                     
-                    <div className="bg-error/10 border border-error/20 rounded-xl p-3 flex justify-between items-center mt-auto">
-                      <div>
-                        <span className="text-xs font-bold text-error uppercase tracking-wider block">Cargar en Jeringa</span>
-                        <div className="text-2xl font-extrabold text-on-surface">{med.volumenTotalMl} <span className="text-base font-bold text-on-surface-variant">cc (ml)</span></div>
-                        <div className="text-xs text-on-surface-variant font-medium mt-1">Total activo: {med.dosisTotalMg} mg</div>
-                      </div>
-                      <div className="w-10 h-10 rounded-full bg-error text-white flex items-center justify-center shadow-sm">
-                        <Syringe className="w-5 h-5" />
-                      </div>
+                    <label className="block text-sm font-bold text-on-surface-variant mb-2">Peso del Paciente</label>
+                    <div className="relative mb-6">
+                      <input 
+                        type="number" 
+                        placeholder="Ej: 70" 
+                        value={pesoSir} 
+                        onChange={e => setPesoSir(e.target.value)} 
+                        className="w-full bg-surface border border-outline/20 rounded-xl py-4 px-4 focus:outline-none focus:border-error text-2xl font-bold text-center" 
+                      />
+                      <span className="absolute right-4 top-5 text-on-surface-variant font-bold">kg</span>
+                    </div>
+                    
+                    <div className="flex-1 flex flex-col justify-end mt-4">
+                      {medCalculated ? (
+                        <div className="bg-error/10 border border-error/20 rounded-2xl p-5 text-center animate-fade-in relative overflow-hidden">
+                          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-error to-pink-500"></div>
+                          <span className="text-xs font-bold text-error uppercase tracking-wider block mb-2">Cargar en Jeringa</span>
+                          <div className="text-5xl font-extrabold text-on-surface mb-2">{medCalculated.volumenTotalMl}</div>
+                          <span className="text-lg font-bold text-on-surface-variant mb-4 block">cc (ml)</span>
+                          <div className="bg-surface/50 py-1.5 rounded-lg">
+                            <span className="text-xs text-on-surface-variant font-semibold">Total activo: {medCalculated.dosisTotalMg} mg</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-surface-container border border-transparent border-dashed rounded-2xl p-6 text-center opacity-60 h-full flex flex-col items-center justify-center">
+                          <Syringe className="w-8 h-8 mb-2 text-outline" />
+                          <p className="text-sm font-bold text-on-surface-variant">Ingresa el peso arriba para ver los mililitros a inyectar</p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
             )}
           </div>
