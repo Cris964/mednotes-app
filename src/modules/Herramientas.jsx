@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calculator, Activity, Brain, Baby, Droplets, ChevronRight } from 'lucide-react';
+import { Calculator, Activity, Brain, Baby, Droplets, ChevronRight, Syringe, AlertTriangle } from 'lucide-react';
 
 export default function Herramientas() {
   const [activeTab, setActiveTab] = useState('calculadoras');
@@ -49,6 +49,33 @@ export default function Herramientas() {
 
   const fppResult = calcularFPP();
 
+  // Herramienta 3: SIR (Secuencia Intubación Rápida)
+  const [pesoSir, setPesoSir] = useState('');
+  
+  const medsSir = [
+    { id: 'fentanilo', nombre: 'Fentanilo', tipo: 'Pretratamiento', dosisEstandar: '2 mcg/kg', dosisUnidad: 'mcg', valorDosis: 2, presentacion: '0.5 mg / 10 ml', mgTotal: 0.5, mlTotal: 10, uso: 'Disminuye respuesta hipertensiva a la intubación.' },
+    { id: 'ketamina', nombre: 'Ketamina', tipo: 'Inducción', dosisEstandar: '1.5 mg/kg', dosisUnidad: 'mg', valorDosis: 1.5, presentacion: '500 mg / 10 ml', mgTotal: 500, mlTotal: 10, uso: 'Elección en hipotensión/asma.', alerta: 'Puede causar hipertensión transitoria y aumento de secreciones.' },
+    { id: 'etomidato', nombre: 'Etomidato', tipo: 'Inducción', dosisEstandar: '0.3 mg/kg', dosisUnidad: 'mg', valorDosis: 0.3, presentacion: '20 mg / 10 ml', mgTotal: 20, mlTotal: 10, uso: 'Elección en inestabilidad hemodinámica.' },
+    { id: 'midazolam', nombre: 'Midazolam', tipo: 'Inducción', dosisEstandar: '0.2 mg/kg', dosisUnidad: 'mg', valorDosis: 0.2, presentacion: '15 mg / 3 ml', mgTotal: 15, mlTotal: 3, uso: 'Útil, pero con mayor riesgo de hipotensión.' },
+    { id: 'rocuronio', nombre: 'Rocuronio', tipo: 'Paralizante', dosisEstandar: '1 mg/kg', dosisUnidad: 'mg', valorDosis: 1, presentacion: '50 mg / 5 ml', mgTotal: 50, mlTotal: 5, uso: 'Alternativa segura si hay contraindicación para Succinilcolina.' },
+  ];
+
+  const calcularSIR = () => {
+    if (!pesoSir) return null;
+    return medsSir.map(med => {
+      let dosisMg = med.dosisUnidad === 'mcg' ? (pesoSir * med.valorDosis) / 1000 : pesoSir * med.valorDosis;
+      let concentracion = med.mgTotal / med.mlTotal;
+      let volumenMl = dosisMg / concentracion;
+      return {
+        ...med,
+        dosisTotalMg: dosisMg.toFixed(2),
+        volumenTotalMl: volumenMl.toFixed(1)
+      };
+    });
+  };
+
+  const resultadosSIR = calcularSIR();
+
   return (
     <div className="animate-fade-in pb-20 md:pb-0">
       <div className="mb-8">
@@ -71,6 +98,68 @@ export default function Herramientas() {
       {activeTab === 'calculadoras' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
+          {/* Calculadora SIR */}
+          <div className="bg-surface/80 backdrop-blur-xl rounded-3xl p-6 border border-outline/10 shadow-sm lg:col-span-2">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-error/10 text-error flex items-center justify-center">
+                <Syringe className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-on-surface">Calculadora de Dosis de Medicamentos</h3>
+                <p className="text-sm text-on-surface-variant">Cálculo exacto en mililitros (cc) según presentación</p>
+              </div>
+            </div>
+            
+            <div className="bg-surface-container-low border border-outline/20 rounded-2xl p-4 mb-6 flex flex-col md:flex-row items-center gap-4">
+              <label className="text-lg font-bold text-on-surface-variant whitespace-nowrap">Peso del Paciente:</label>
+              <div className="relative w-full md:w-64">
+                <input type="number" placeholder="Ej: 70" value={pesoSir} onChange={e => setPesoSir(e.target.value)} className="w-full bg-surface border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-error text-xl font-bold" />
+                <span className="absolute right-4 top-3 text-on-surface-variant font-bold">kg</span>
+              </div>
+            </div>
+            
+            {!resultadosSIR ? (
+              <div className="bg-surface-container p-8 rounded-2xl border border-transparent text-center opacity-50">
+                <p className="text-lg font-bold">Ingresa el peso del paciente para ver las dosis en cc</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {resultadosSIR.map((med) => (
+                  <div key={med.id} className="bg-surface border border-outline/10 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col">
+                    <div className="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-error to-error/50"></div>
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-bold text-lg text-on-surface">{med.nombre}</h4>
+                      <span className="text-xs font-bold bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-md">{med.tipo}</span>
+                    </div>
+                    
+                    <div className="flex flex-col gap-1 mb-4 flex-1">
+                      <p className="text-sm text-on-surface-variant"><span className="font-semibold">Dosis:</span> {med.dosisEstandar}</p>
+                      <p className="text-sm text-on-surface-variant"><span className="font-semibold">Presentación:</span> {med.presentacion}</p>
+                      <p className="text-sm text-on-surface-variant mt-1">{med.uso}</p>
+                      {med.alerta && (
+                        <div className="flex items-start gap-1 mt-2 text-status-warning bg-status-warning/10 p-2 rounded-lg text-xs font-semibold">
+                          <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          <p>{med.alerta}</p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="bg-error/10 border border-error/20 rounded-xl p-3 flex justify-between items-center mt-auto">
+                      <div>
+                        <span className="text-xs font-bold text-error uppercase tracking-wider block">Cargar en Jeringa</span>
+                        <div className="text-2xl font-extrabold text-on-surface">{med.volumenTotalMl} <span className="text-base font-bold text-on-surface-variant">cc (ml)</span></div>
+                        <div className="text-xs text-on-surface-variant font-medium mt-1">Total activo: {med.dosisTotalMg} mg</div>
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-error text-white flex items-center justify-center shadow-sm">
+                        <Syringe className="w-5 h-5" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Calculadora IMC */}
           <div className="bg-surface/80 backdrop-blur-xl rounded-3xl p-6 border border-outline/10 shadow-sm">
             <div className="flex items-center gap-3 mb-6">
