@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { Calculator, Activity, Brain, Baby, Droplets, ChevronRight, Syringe, AlertTriangle, Search, ArrowLeft } from 'lucide-react';
+import { Calculator, Brain, Droplets, ChevronRight, Syringe, AlertTriangle, Search, ArrowLeft, Plus, X, Trash2 } from 'lucide-react';
+
+const UNIDADES = ['mg', 'mcg'];
+const TIPOS = ['Pretratamiento', 'Inducción', 'Paralizante', 'Analgésico', 'Sedante', 'Otro'];
+const FORM_VACIO = { nombre: '', tipo: 'Otro', dosisUnidad: 'mg', valorDosis: '', mgTotal: '', mlTotal: '', uso: '', alerta: '' };
 
 export default function Herramientas() {
   const [activeTab, setActiveTab] = useState('calculadoras');
@@ -8,16 +12,18 @@ export default function Herramientas() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMed, setSelectedMed] = useState(null);
   const [pesoSir, setPesoSir] = useState('');
-  
-  const medsSir = [
-    { id: 'fentanilo', nombre: 'Fentanilo', tipo: 'Pretratamiento', dosisEstandar: '2 mcg/kg', dosisUnidad: 'mcg', valorDosis: 2, presentacion: '0.5 mg / 10 ml', mgTotal: 0.5, mlTotal: 10, uso: 'Disminuye respuesta hipertensiva a la intubación.' },
-    { id: 'ketamina', nombre: 'Ketamina', tipo: 'Inducción', dosisEstandar: '1.5 mg/kg', dosisUnidad: 'mg', valorDosis: 1.5, presentacion: '500 mg / 10 ml', mgTotal: 500, mlTotal: 10, uso: 'Elección en hipotensión/asma.', alerta: 'Puede causar hipertensión transitoria y aumento de secreciones.' },
-    { id: 'etomidato', nombre: 'Etomidato', tipo: 'Inducción', dosisEstandar: '0.3 mg/kg', dosisUnidad: 'mg', valorDosis: 0.3, presentacion: '20 mg / 10 ml', mgTotal: 20, mlTotal: 10, uso: 'Elección en inestabilidad hemodinámica.' },
-    { id: 'midazolam', nombre: 'Midazolam', tipo: 'Inducción', dosisEstandar: '0.2 mg/kg', dosisUnidad: 'mg', valorDosis: 0.2, presentacion: '15 mg / 3 ml', mgTotal: 15, mlTotal: 3, uso: 'Útil, pero con mayor riesgo de hipotensión.' },
-    { id: 'rocuronio', nombre: 'Rocuronio', tipo: 'Paralizante', dosisEstandar: '1 mg/kg', dosisUnidad: 'mg', valorDosis: 1, presentacion: '50 mg / 5 ml', mgTotal: 50, mlTotal: 5, uso: 'Alternativa segura si hay contraindicación para Succinilcolina.' },
-  ];
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(FORM_VACIO);
+  const [formError, setFormError] = useState('');
+  const [meds, setMeds] = useState([
+    { id: 'fentanilo', nombre: 'Fentanilo', tipo: 'Pretratamiento', dosisEstandar: '2 mcg/kg', dosisUnidad: 'mcg', valorDosis: 2, presentacion: '0.5 mg / 10 ml', mgTotal: 0.5, mlTotal: 10, uso: 'Disminuye respuesta hipertensiva a la intubación.', custom: false },
+    { id: 'ketamina', nombre: 'Ketamina', tipo: 'Inducción', dosisEstandar: '1.5 mg/kg', dosisUnidad: 'mg', valorDosis: 1.5, presentacion: '500 mg / 10 ml', mgTotal: 500, mlTotal: 10, uso: 'Elección en hipotensión/asma.', alerta: 'Puede causar hipertensión transitoria y aumento de secreciones.', custom: false },
+    { id: 'etomidato', nombre: 'Etomidato', tipo: 'Inducción', dosisEstandar: '0.3 mg/kg', dosisUnidad: 'mg', valorDosis: 0.3, presentacion: '20 mg / 10 ml', mgTotal: 20, mlTotal: 10, uso: 'Elección en inestabilidad hemodinámica.', custom: false },
+    { id: 'midazolam', nombre: 'Midazolam', tipo: 'Inducción', dosisEstandar: '0.2 mg/kg', dosisUnidad: 'mg', valorDosis: 0.2, presentacion: '15 mg / 3 ml', mgTotal: 15, mlTotal: 3, uso: 'Útil, pero con mayor riesgo de hipotensión.', custom: false },
+    { id: 'rocuronio', nombre: 'Rocuronio', tipo: 'Paralizante', dosisEstandar: '1 mg/kg', dosisUnidad: 'mg', valorDosis: 1, presentacion: '50 mg / 5 ml', mgTotal: 50, mlTotal: 5, uso: 'Alternativa segura si hay contraindicación para Succinilcolina.', custom: false },
+  ]);
 
-  const filteredMeds = medsSir.filter(med => med.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredMeds = meds.filter(med => med.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
 
   let medCalculated = null;
   if (selectedMed && pesoSir) {
@@ -29,6 +35,31 @@ export default function Herramientas() {
       volumenTotalMl: volumenMl.toFixed(1)
     };
   }
+
+  const handleFormChange = (e) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormError('');
+  };
+
+  const handleAgregarMed = () => {
+    if (!form.nombre.trim()) return setFormError('El nombre es obligatorio.');
+    if (!form.valorDosis || Number(form.valorDosis) <= 0) return setFormError('La dosis por kg debe ser mayor a 0.');
+    if (!form.mgTotal || Number(form.mgTotal) <= 0) return setFormError('El contenido de la ampolla (mg) debe ser mayor a 0.');
+    if (!form.mlTotal || Number(form.mlTotal) <= 0) return setFormError('El volumen de la ampolla (ml) debe ser mayor a 0.');
+    setMeds(prev => [...prev, {
+      id: `custom-${Date.now()}`,
+      nombre: form.nombre.trim(), tipo: form.tipo,
+      dosisUnidad: form.dosisUnidad, valorDosis: Number(form.valorDosis),
+      dosisEstandar: `${form.valorDosis} ${form.dosisUnidad}/kg`,
+      presentacion: `${form.mgTotal} mg / ${form.mlTotal} ml`,
+      mgTotal: Number(form.mgTotal), mlTotal: Number(form.mlTotal),
+      uso: form.uso.trim() || 'Sin indicación registrada.',
+      alerta: form.alerta.trim() || null, custom: true,
+    }]);
+    setForm(FORM_VACIO); setShowForm(false); setFormError('');
+  };
+
+  const handleEliminarMed = (id) => setMeds(prev => prev.filter(m => m.id !== id));
 
   return (
     <div className="animate-fade-in pb-20 md:pb-0">
@@ -57,14 +88,23 @@ export default function Herramientas() {
             {!selectedMed ? (
               // Vista de Buscador
               <>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-error/10 text-error flex items-center justify-center">
-                    <Syringe className="w-6 h-6" />
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-error/10 text-error flex items-center justify-center">
+                      <Syringe className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-on-surface">Calculadora de Dosis de Medicamentos</h3>
+                      <p className="text-sm text-on-surface-variant">Vademécum y cálculo exacto en cc según presentación</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-on-surface">Calculadora de Dosis de Medicamentos</h3>
-                    <p className="text-sm text-on-surface-variant">Vademécum y cálculo exacto en cc según presentación</p>
-                  </div>
+                  <button
+                    onClick={() => { setShowForm(true); setFormError(''); }}
+                    className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all whitespace-nowrap"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Agregar Medicamento
+                  </button>
                 </div>
                 
                 <div className="relative mb-6">
@@ -82,16 +122,27 @@ export default function Herramientas() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {filteredMeds.map(med => (
-                    <button 
-                      key={med.id}
-                      onClick={() => { setSelectedMed(med); setPesoSir(''); }}
-                      className="text-left bg-surface border border-outline/10 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-primary/30 transition-all group relative overflow-hidden"
-                    >
-                      <div className="absolute top-0 right-0 w-1.5 h-full bg-error/50 group-hover:bg-error transition-colors"></div>
-                      <h4 className="font-bold text-lg text-on-surface group-hover:text-primary transition-colors">{med.nombre}</h4>
-                      <p className="text-sm text-on-surface-variant mb-2">{med.tipo}</p>
-                      <p className="text-xs text-outline">{med.dosisEstandar}</p>
-                    </button>
+                    <div key={med.id} className="relative group">
+                      <button 
+                        onClick={() => { setSelectedMed(med); setPesoSir(''); }}
+                        className="w-full text-left bg-surface border border-outline/10 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-primary/30 transition-all relative overflow-hidden"
+                      >
+                        <div className={`absolute top-0 right-0 w-1.5 h-full transition-colors ${med.custom ? 'bg-primary/50 group-hover:bg-primary' : 'bg-error/50 group-hover:bg-error'}`}></div>
+                        <div className="flex items-start justify-between pr-2">
+                          <div>
+                            <h4 className="font-bold text-lg text-on-surface group-hover:text-primary transition-colors">{med.nombre}</h4>
+                            <p className="text-sm text-on-surface-variant mb-2">{med.tipo}</p>
+                            <p className="text-xs text-outline">{med.dosisEstandar}</p>
+                          </div>
+                          {med.custom && <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase tracking-wide ml-2 flex-shrink-0">Custom</span>}
+                        </div>
+                      </button>
+                      {med.custom && (
+                        <button onClick={() => handleEliminarMed(med.id)} className="absolute top-2 right-4 p-1 rounded-full bg-error/10 text-error opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error/20" title="Eliminar">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   ))}
                   {filteredMeds.length === 0 && (
                     <div className="col-span-full text-center py-8 text-on-surface-variant">
@@ -99,6 +150,69 @@ export default function Herramientas() {
                     </div>
                   )}
                 </div>
+
+                {showForm && (
+                  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-surface rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 animate-fade-in">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-2xl font-extrabold text-on-surface">Nuevo Medicamento</h3>
+                        <button onClick={() => { setShowForm(false); setForm(FORM_VACIO); setFormError(''); }} className="p-2 rounded-full hover:bg-surface-container text-outline transition-colors"><X className="w-6 h-6" /></button>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-bold text-on-surface-variant mb-1">Nombre del Medicamento *</label>
+                          <input name="nombre" value={form.nombre} onChange={handleFormChange} placeholder="Ej: Morfina" className="w-full bg-surface-container-low border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-primary" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-on-surface-variant mb-1">Tipo / Categoría</label>
+                          <select name="tipo" value={form.tipo} onChange={handleFormChange} className="w-full bg-surface-container-low border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-primary">
+                            {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-bold text-on-surface-variant mb-1">Dosis por kg *</label>
+                            <input name="valorDosis" type="number" value={form.valorDosis} onChange={handleFormChange} placeholder="Ej: 0.1" className="w-full bg-surface-container-low border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-primary" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-on-surface-variant mb-1">Unidad</label>
+                            <select name="dosisUnidad" value={form.dosisUnidad} onChange={handleFormChange} className="w-full bg-surface-container-low border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-primary">
+                              {UNIDADES.map(u => <option key={u} value={u}>{u}/kg</option>)}
+                            </select>
+                          </div>
+                        </div>
+                        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest pt-1">Presentación de la Ampolla</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-bold text-on-surface-variant mb-1">Contenido total (mg) *</label>
+                            <input name="mgTotal" type="number" value={form.mgTotal} onChange={handleFormChange} placeholder="Ej: 10" className="w-full bg-surface-container-low border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-primary" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-on-surface-variant mb-1">Volumen total (ml) *</label>
+                            <input name="mlTotal" type="number" value={form.mlTotal} onChange={handleFormChange} placeholder="Ej: 1" className="w-full bg-surface-container-low border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-primary" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-on-surface-variant mb-1">Indicación / Uso</label>
+                          <textarea name="uso" value={form.uso} onChange={handleFormChange} rows={2} placeholder="Ej: Para analgesia post-operatoria..." className="w-full bg-surface-container-low border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-primary resize-none" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-on-surface-variant mb-1">⚠️ Alerta de Seguridad (opcional)</label>
+                          <input name="alerta" value={form.alerta} onChange={handleFormChange} placeholder="Ej: Riesgo de depresión respiratoria" className="w-full bg-surface-container-low border border-outline/20 rounded-xl py-3 px-4 focus:outline-none focus:border-status-warning" />
+                        </div>
+                        {formError && (
+                          <div className="flex items-center gap-2 bg-error/10 text-error p-3 rounded-xl text-sm font-semibold">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />{formError}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-3 mt-6">
+                        <button onClick={() => { setShowForm(false); setForm(FORM_VACIO); setFormError(''); }} className="flex-1 py-3 rounded-xl border border-outline/20 font-bold text-on-surface-variant hover:bg-surface-container transition-colors">Cancelar</button>
+                        <button onClick={handleAgregarMed} className="flex-1 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 shadow-md hover:shadow-lg transition-all">Agregar a la lista</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               // Vista de Detalle de Medicamento
