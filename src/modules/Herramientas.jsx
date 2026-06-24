@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../db';
 import { Calculator, Brain, Droplets, ChevronRight, Syringe, AlertTriangle, Search, ArrowLeft, Plus, X, Trash2 } from 'lucide-react';
 
 const UNIDADES = ['mg', 'mcg'];
@@ -15,13 +17,14 @@ export default function Herramientas() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(FORM_VACIO);
   const [formError, setFormError] = useState('');
-  const [meds, setMeds] = useState([
-    { id: 'fentanilo', nombre: 'Fentanilo', tipo: 'Pretratamiento', dosisEstandar: '2 mcg/kg', dosisUnidad: 'mcg', valorDosis: 2, presentacion: '0.5 mg / 10 ml', mgTotal: 0.5, mlTotal: 10, uso: 'Disminuye respuesta hipertensiva a la intubación.', custom: false },
-    { id: 'ketamina', nombre: 'Ketamina', tipo: 'Inducción', dosisEstandar: '1.5 mg/kg', dosisUnidad: 'mg', valorDosis: 1.5, presentacion: '500 mg / 10 ml', mgTotal: 500, mlTotal: 10, uso: 'Elección en hipotensión/asma.', alerta: 'Puede causar hipertensión transitoria y aumento de secreciones.', custom: false },
-    { id: 'etomidato', nombre: 'Etomidato', tipo: 'Inducción', dosisEstandar: '0.3 mg/kg', dosisUnidad: 'mg', valorDosis: 0.3, presentacion: '20 mg / 10 ml', mgTotal: 20, mlTotal: 10, uso: 'Elección en inestabilidad hemodinámica.', custom: false },
-    { id: 'midazolam', nombre: 'Midazolam', tipo: 'Inducción', dosisEstandar: '0.2 mg/kg', dosisUnidad: 'mg', valorDosis: 0.2, presentacion: '15 mg / 3 ml', mgTotal: 15, mlTotal: 3, uso: 'Útil, pero con mayor riesgo de hipotensión.', custom: false },
-    { id: 'rocuronio', nombre: 'Rocuronio', tipo: 'Paralizante', dosisEstandar: '1 mg/kg', dosisUnidad: 'mg', valorDosis: 1, presentacion: '50 mg / 5 ml', mgTotal: 50, mlTotal: 5, uso: 'Alternativa segura si hay contraindicación para Succinilcolina.', custom: false },
-  ]);
+
+  // Medicamentos custom guardados en IndexedDB (persisten entre sesiones)
+  const medsCustomDB = useLiveQuery(() => db.medicamentosCustom.toArray(), []) ?? [];
+
+  const meds = [
+    ...MEDS_INICIALES,
+    ...medsCustomDB.map(m => ({ ...m, id: `db-${m.id}`, custom: true })),
+  ];
 
   const filteredMeds = meds.filter(med => med.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -41,25 +44,34 @@ export default function Herramientas() {
     setFormError('');
   };
 
-  const handleAgregarMed = () => {
+  const handleAgregarMed = async () => {
     if (!form.nombre.trim()) return setFormError('El nombre es obligatorio.');
     if (!form.valorDosis || Number(form.valorDosis) <= 0) return setFormError('La dosis por kg debe ser mayor a 0.');
     if (!form.mgTotal || Number(form.mgTotal) <= 0) return setFormError('El contenido de la ampolla (mg) debe ser mayor a 0.');
     if (!form.mlTotal || Number(form.mlTotal) <= 0) return setFormError('El volumen de la ampolla (ml) debe ser mayor a 0.');
-    setMeds(prev => [...prev, {
-      id: `custom-${Date.now()}`,
-      nombre: form.nombre.trim(), tipo: form.tipo,
-      dosisUnidad: form.dosisUnidad, valorDosis: Number(form.valorDosis),
+    await db.medicamentosCustom.add({
+      nombre: form.nombre.trim(),
+      tipo: form.tipo,
+      dosisUnidad: form.dosisUnidad,
+      valorDosis: Number(form.valorDosis),
       dosisEstandar: `${form.valorDosis} ${form.dosisUnidad}/kg`,
       presentacion: `${form.mgTotal} mg / ${form.mlTotal} ml`,
-      mgTotal: Number(form.mgTotal), mlTotal: Number(form.mlTotal),
+      mgTotal: Number(form.mgTotal),
+      mlTotal: Number(form.mlTotal),
       uso: form.uso.trim() || 'Sin indicación registrada.',
-      alerta: form.alerta.trim() || null, custom: true,
-    }]);
+      alerta: form.alerta.trim() || null,
+    });
     setForm(FORM_VACIO); setShowForm(false); setFormError('');
   };
 
-  const handleEliminarMed = (id) => setMeds(prev => prev.filter(m => m.id !== id));
+  const handleEliminarMed = async (med) => {
+    // Solo eliminar si es custom guardado en DB (id empieza con 'db-')
+    if (med.id && String(med.id).startsWith('db-')) {
+      const dbId = Number(String(med.id).replace('db-', ''));
+      await db.medicamentosCustom.delete(dbId);
+      if (selectedMed?.id === med.id) setSelectedMed(null);
+    }
+  };
 
   return (
     <div className="animate-fade-in pb-20 md:pb-0">
@@ -138,7 +150,7 @@ export default function Herramientas() {
                         </div>
                       </button>
                       {med.custom && (
-                        <button onClick={() => handleEliminarMed(med.id)} className="absolute top-2 right-4 p-1 rounded-full bg-error/10 text-error opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error/20" title="Eliminar">
+                        <button onClick={() => handleEliminarMed(med)} className="absolute top-2 right-4 p-1 rounded-full bg-error/10 text-error opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error/20" title="Eliminar">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}

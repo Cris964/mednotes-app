@@ -11,6 +11,15 @@ db.version(3).stores({
   inventario: '++id, medicamento, enfermedades, concentracion, presentacion, cantidad, fechaCaducidad, modo'
 });
 
+// Versión 4: tabla de medicamentos personalizados de la calculadora
+db.version(4).stores({
+  pacientes: '++id, nombre, documento, genero, fechaNacimiento, telefono, ultimaVisita, modo',
+  historias: '++id, pacienteId, fechaHora, motivoConsulta, enfermedadActual, diagnostico, tratamiento, notas, modo',
+  turnos: '++id, fecha, tipo, hospital, horaInicio, horaFin, modo',
+  inventario: '++id, medicamento, enfermedades, concentracion, presentacion, cantidad, fechaCaducidad, modo',
+  medicamentosCustom: '++id, nombre, tipo, dosisUnidad, valorDosis, dosisEstandar, presentacion, mgTotal, mlTotal, uso, alerta'
+});
+
 // Semilla de datos iniciales (opcional, para desarrollo)
 db.on('populate', () => {
   db.pacientes.add({
