@@ -7,6 +7,14 @@ const UNIDADES = ['mg', 'mcg'];
 const TIPOS = ['Pretratamiento', 'Inducción', 'Paralizante', 'Analgésico', 'Sedante', 'Otro'];
 const FORM_VACIO = { nombre: '', tipo: 'Otro', dosisUnidad: 'mg', valorDosis: '', mgTotal: '', mlTotal: '', uso: '', alerta: '' };
 
+const MEDS_INICIALES = [
+  { id: 'fentanilo', nombre: 'Fentanilo', tipo: 'Pretratamiento', dosisEstandar: '2 mcg/kg', dosisUnidad: 'mcg', valorDosis: 2, presentacion: '0.5 mg / 10 ml', mgTotal: 0.5, mlTotal: 10, uso: 'Disminuye respuesta hipertensiva a la intubación.', custom: false },
+  { id: 'ketamina', nombre: 'Ketamina', tipo: 'Inducción', dosisEstandar: '1.5 mg/kg', dosisUnidad: 'mg', valorDosis: 1.5, presentacion: '500 mg / 10 ml', mgTotal: 500, mlTotal: 10, uso: 'Elección en hipotensión/asma.', alerta: 'Puede causar hipertensión transitoria y aumento de secreciones.', custom: false },
+  { id: 'etomidato', nombre: 'Etomidato', tipo: 'Inducción', dosisEstandar: '0.3 mg/kg', dosisUnidad: 'mg', valorDosis: 0.3, presentacion: '20 mg / 10 ml', mgTotal: 20, mlTotal: 10, uso: 'Elección en inestabilidad hemodinámica.', custom: false },
+  { id: 'midazolam', nombre: 'Midazolam', tipo: 'Inducción', dosisEstandar: '0.2 mg/kg', dosisUnidad: 'mg', valorDosis: 0.2, presentacion: '15 mg / 3 ml', mgTotal: 15, mlTotal: 3, uso: 'Útil, pero con mayor riesgo de hipotensión.', custom: false },
+  { id: 'rocuronio', nombre: 'Rocuronio', tipo: 'Paralizante', dosisEstandar: '1 mg/kg', dosisUnidad: 'mg', valorDosis: 1, presentacion: '50 mg / 5 ml', mgTotal: 50, mlTotal: 5, uso: 'Alternativa segura si hay contraindicación para Succinilcolina.', custom: false },
+];
+
 export default function Herramientas() {
   const [activeTab, setActiveTab] = useState('calculadoras');
 
