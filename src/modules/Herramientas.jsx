@@ -13,6 +13,8 @@ const MEDS_INICIALES = [
   { id: 'etomidato', nombre: 'Etomidato', tipo: 'Inducción', dosisEstandar: '0.3 mg/kg', dosisUnidad: 'mg', valorDosis: 0.3, presentacion: '20 mg / 10 ml', mgTotal: 20, mlTotal: 10, uso: 'Elección en inestabilidad hemodinámica.', custom: false },
   { id: 'midazolam', nombre: 'Midazolam', tipo: 'Inducción', dosisEstandar: '0.2 mg/kg', dosisUnidad: 'mg', valorDosis: 0.2, presentacion: '15 mg / 3 ml', mgTotal: 15, mlTotal: 3, uso: 'Útil, pero con mayor riesgo de hipotensión.', custom: false },
   { id: 'rocuronio', nombre: 'Rocuronio', tipo: 'Paralizante', dosisEstandar: '1 mg/kg', dosisUnidad: 'mg', valorDosis: 1, presentacion: '50 mg / 5 ml', mgTotal: 50, mlTotal: 5, uso: 'Alternativa segura si hay contraindicación para Succinilcolina.', custom: false },
+  { id: 'remifentanilo', nombre: 'Remifentanilo', tipo: 'Analgésico', dosisEstandar: '1-2 mcg/kg', dosisUnidad: 'mcg', valorDosis: 2, presentacion: '1 mg / 1 ml (Reconstituido)', mgTotal: 1, mlTotal: 1, uso: 'Analgesia y anestesia.', preparacion: 'Diluir en SSN 0.9% o DAD 5%.', dilucion: 'Concentración habitual de infusión: 20–50 mcg/mL.', custom: false },
+  { id: 'morfina', nombre: 'Morfina', tipo: 'Analgésico', dosisEstandar: '0.05–0.1 mg/kg', dosisUnidad: 'mg', valorDosis: 0.1, presentacion: '10 mg / 1 ml', mgTotal: 10, mlTotal: 1, uso: 'Manejo del dolor moderado a severo.', preparacion: 'Puede administrarse IV lenta o diluirse en SSN 0.9%.', dilucion: 'Dilución frecuente: 1 mg/mL.', custom: false },
 ];
 
 export default function Herramientas() {
@@ -39,11 +41,12 @@ export default function Herramientas() {
   let medCalculated = null;
   if (selectedMed && pesoSir) {
     let dosisMg = selectedMed.dosisUnidad === 'mcg' ? (pesoSir * selectedMed.valorDosis) / 1000 : pesoSir * selectedMed.valorDosis;
+    let dosisDisplay = selectedMed.dosisUnidad === 'mcg' ? (pesoSir * selectedMed.valorDosis) : (pesoSir * selectedMed.valorDosis);
     let concentracion = selectedMed.mgTotal / selectedMed.mlTotal;
     let volumenMl = dosisMg / concentracion;
     medCalculated = {
-      dosisTotalMg: dosisMg.toFixed(2),
-      volumenTotalMl: volumenMl.toFixed(1)
+      dosisTotalMg: dosisDisplay.toFixed(2).replace(/\.00$/, ''),
+      volumenTotalMl: volumenMl.toFixed(2).replace(/\.00$/, '')
     };
   }
 
@@ -301,21 +304,42 @@ export default function Herramientas() {
                       {medCalculated ? (
                         <div className="bg-error/10 border border-error/20 rounded-2xl p-5 text-center animate-fade-in relative overflow-hidden">
                           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-error to-pink-500"></div>
-                          <span className="text-xs font-bold text-error uppercase tracking-wider block mb-2">Cargar en Jeringa</span>
+                          <span className="text-xs font-bold text-error uppercase tracking-wider block mb-2">Volumen a extraer</span>
                           <div className="text-5xl font-extrabold text-on-surface mb-2">{medCalculated.volumenTotalMl}</div>
                           <span className="text-lg font-bold text-on-surface-variant mb-4 block">cc (ml)</span>
-                          <div className="bg-surface/50 py-1.5 rounded-lg">
-                            <span className="text-xs text-on-surface-variant font-semibold">Total activo: {medCalculated.dosisTotalMg} mg</span>
+                          <div className="bg-surface/50 py-1.5 rounded-lg mb-4">
+                            <span className="text-sm text-on-surface font-semibold">Dosis calculada: {medCalculated.dosisTotalMg} {selectedMed.dosisUnidad}</span>
                           </div>
+
+                          {(selectedMed.preparacion || selectedMed.dilucion) && (
+                            <div className="text-left mt-4 border-t border-error/20 pt-4 space-y-3">
+                              {selectedMed.preparacion && (
+                                <div>
+                                  <span className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider block mb-0.5">Preparación sugerida:</span>
+                                  <span className="text-sm font-semibold text-on-surface">{selectedMed.preparacion}</span>
+                                </div>
+                              )}
+                              {selectedMed.dilucion && (
+                                <div>
+                                  <span className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider block mb-0.5">Dilución frecuente:</span>
+                                  <span className="text-sm font-semibold text-on-surface">{selectedMed.dilucion}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="bg-surface-container border border-transparent border-dashed rounded-2xl p-6 text-center opacity-60 h-full flex flex-col items-center justify-center">
                           <Syringe className="w-8 h-8 mb-2 text-outline" />
-                          <p className="text-sm font-bold text-on-surface-variant">Ingresa el peso arriba para ver los mililitros a inyectar</p>
+                          <p className="text-sm font-bold text-on-surface-variant">Ingresa el peso arriba para ver los mililitros a extraer</p>
                         </div>
                       )}
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-8 text-xs text-on-surface-variant bg-surface-container-lowest p-4 rounded-xl border border-outline/10 text-center italic">
+                  "Las recomendaciones de reconstitución y dilución pueden variar según protocolos institucionales, población (adulto/pediatría) y vía de administración. Verificar siempre la ficha técnica local."
                 </div>
               </div>
             )}
